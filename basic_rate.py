@@ -18,19 +18,40 @@ data.columns = ['날짜', '기준금리']
 dates = data['날짜']
 values = data['기준금리']
 
-# %%
-# 문자열 날짜를 datetime 객체로 변환
-import matplotlib.dates as mdates
-from datetime import datetime
+# # %%
+# # 문자열 날짜를 datetime 객체로 변환
+# import matplotlib.dates as mdates
+# from datetime import datetime
 
-dates = [datetime.strptime(date, "%Y/%m") for date in dates]
+# dates = [datetime.strptime(date, "%Y/%m") for date in dates]
 
 # %%
 
 # 폰트 경로
-import add_font as af
-af.reg()
+# from add_font import *
 
+# reg()
+def reg():
+    import matplotlib.font_manager as fm
+    import os
+
+    user_name = os.getlogin()
+
+    fontpath = [f'C:/Users/{user_name}/AppData/Local/Microsoft/Windows/Fonts']
+    font_files = fm.findSystemFonts(fontpaths=fontpath)
+    for fpath in font_files:
+        
+        fm.fontManager.addfont(fpath)
+
+def fontpath():
+    
+    import os
+
+    user_name = os.getlogin()
+
+    return f'C:/Users/{user_name}/AppData/Local/Microsoft/Windows/Fonts'
+
+reg()
 # 폰트 설정
 plt.rc('font', family='NaNumBarunGothic')
 plt.rcParams['figure.dpi'] = 140
@@ -42,8 +63,9 @@ plt.plot(dates, values)
 
 
 # x축 눈금을 45도 회전
-plt.xticks(rotation=45)
-
+plt.xlim(dates[0], dates[len(dates)-1])
+plt.xticks(range(0,133,3),dates[::3],rotation=45)
+# plt.xticks(눈금을 적용할 x축의 실제 위치, 해당 위치에 나타낼 값)
 plt.title('한국 기준금리 월별 변화 (2013년 4월 ~ 2024년 5월)')
 plt.xlabel('날짜')
 plt.ylabel('기준금리')
