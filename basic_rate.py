@@ -28,9 +28,8 @@ dates = [datetime.strptime(date, "%Y/%m") for date in dates]
 # %%
 
 # 폰트 경로
-from add_font import *
-
-reg()
+import add_font as af
+af.reg()
 
 # 폰트 설정
 plt.rc('font', family='NaNumBarunGothic')
@@ -39,14 +38,8 @@ plt.rcParams['figure.dpi'] = 140
 # 선 그래프 그리기
 plt.figure(figsize=(16, 6))
 
-# fig, ax = plt.subplots()
 plt.plot(dates, values)
 
-# x축 범위 설정
-plt.xlim(dates[0], dates[-1])
-
-# x축 눈금을 3개월
-plt.xticks(dates[::3], [date.strftime("%y/%m") for date in dates[::3]], rotation=45, ha='right', fontsize=8)
 
 # x축 눈금을 45도 회전
 plt.xticks(rotation=45)
