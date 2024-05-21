@@ -15,7 +15,7 @@ data.columns = ['날짜', '기준금리']
 # data.set_index('날짜')
 # %%
 # Extract the base rate values
-dates = data['날짜']
+dates = data['날짜'].str[2:]
 values = data['기준금리']
 
 # # %%
