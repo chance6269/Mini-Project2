@@ -96,7 +96,7 @@ corr_order
 # 토지매매거래량         0.086382
 # 순수토지매매거래량       0.017562
 # Name: 실거래가격지수, dtype: float64
-
+corr_order.index
 # %%
 # plot_cols = ['실거래가격지수','1인가구','무주택가구_수','종합부동산세_세율_개인','혼인건수']
 # plot_df = df.loc[:, plot_cols]
@@ -130,18 +130,31 @@ df.iloc[:, 1:] = df_scaled[:,:]
 df.head()
 
 # %%
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+df.drop(columns='대통령', inplace=True)
+# VIF 출력을 위한 데이터 프레임 형성
+vif = pd.DataFrame()
+
+# VIF 값과 각 Feature 이름에 대해 설정
+vif["VIF Factor"] = [variance_inflation_factor(df.iloc[:,1:].values, i) for i in range(df.iloc[:,1:].shape[1])]
+vif["features"] = df.columns[1:] 
+
+# VIF 값이 높은 순으로 정렬
+vif = vif.sort_values(by="VIF Factor", ascending=False)
+vif = vif.reset_index().drop(columns='index')
+vif
+# 출처: https://signature95.tistory.com/18 [DataAnalyst:티스토리]
+# %%
+
 from sklearn.model_selection import train_test_split
-X_data = df.loc[:,['대통령', '지지율', '1인가구', '2인가구', '3인가구', '4인가구', '4인가구_이상',
-       '무주택가구_수', '외국인_장기체류', 'PIR지수_전국', 'PIR지수_서울', 'LIR지수_전국', 'LIR지수_서울',
-       '혼인건수', '이혼건수', '매매수급동향', '주택부담구입지수', '기준금리', '소비자물가지수', '국회의석수_진보',
-       '국회의석수_보수', '종합부동산세_세율_개인', '자가보유율', '자가점유율', '1인당_주거면적', '주택매매거래량',
-       '아파트매매거래량', '토지매매거래량', '순수토지매매거래량', '주택담보대출', '예적금담보대출']]
+X_data = df.loc[:,corr_order.index[:13]]
 y_data = df.loc[:, '실거래가격지수']
 X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, shuffle=True)
 print(X_train.shape, y_train.shape)
 print(X_test.shape, y_test.shape)
-# (105, 2) (105,)
-# (27, 2) (27,)
+# (105, 13) (105,)
+# (27, 13) (27,)
 # %%
 
 '''
@@ -181,8 +194,8 @@ print("Train MSE:%.4f" % train_mse)
 test_mse = mean_squared_error(y_test, y_test_pred)
 print("Test MSE:%.4f" % test_mse)
 
-# Train MSE:2.1746
-# Test MsE:4.4011
+# Train MSE:6.3285
+# Test MsE:7.5072
 # 작을수록 모델 성능이 좋은 것.
 
 # %%
@@ -193,6 +206,5 @@ mse_scores = -1*cross_val_score(lr, X_train, y_train, cv=5,
                                 scoring='neg_mean_squared_error')
 print("개별 Fold MSE:", np.round(mse_scores, 4))
 print("평균 MSE:%.4f" % np.mean(mse_scores))
-# 개별 Fold MSE: [7.7913 2.0703 6.6352 7.921  1.626 ]
-# 평균 MSE:5.2088
-
+# 개별 Fold MSE: [21.5966 14.7245  6.8402  6.744  10.3203]
+# 평균 MSE:12.0451
