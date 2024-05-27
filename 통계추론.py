@@ -23,6 +23,12 @@ data = df.iloc[:,1:]
 target = df.loc[:,['실거래가격지수']]
 
 # %%
+from scipy import stats
+stats.zscore(target)
+
+stats.norm.cdf(0)
+
+# %%
 '''
 상관관계분석
 '''
@@ -97,82 +103,4 @@ sns.displot(x='실거래가격지수',kind='hist', data=df)
 plt.show()
     # 좌편향인걸 확인
     
-# %%
-'''
-피처 스케일링
-'''
-from sklearn.preprocessing import MinMaxScaler
-scaler=MinMaxScaler()
 
-df_scaled = df.iloc[:, 1:]
-scaler.fit(df_scaled)
-df_scaled = scaler.transform(df_scaled)
-
-df.iloc[:, 1:] = df_scaled[:,:]
-df.head()
-
-# %%
-from sklearn.model_selection import train_test_split
-cols_selected = ['1인가구', '주택부담구입지수','주택매매거래량','PIR지수_전국','혼인건수']
-X_data = df.loc[:, cols_selected]
-y_data = df.loc[:, '실거래가격지수']
-X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, shuffle=True)
-print(X_train.shape, y_train.shape)
-print(X_test.shape, y_test.shape)
-# (105, 12) (105,)
-# (27, 12) (27,)
-# %%
-
-'''
-베이스라인 모델 - 선형회귀
-'''
-from sklearn.linear_model import LinearRegression
-import numpy as np
-lr = LinearRegression()
-lr.fit(X_train, y_train)
-
-print('결정계수:',lr.score(X_test,y_test))
-print('회귀계수:',np.round(lr.coef_, 1))
-print('상수항:',np.round(lr.intercept_, 1))
-
-# %%
-# 예측
-y_test_pred = lr.predict(X_test)
-
-# 예측값, 실제값의 분포
-plt.figure(figsize=(10,5))
-ax1 = sns.kdeplot(y_test, label='실제값')
-ax2 = sns.kdeplot(y_test_pred, label='예측값', ax=ax1)
-plt.legend()
-plt.show()
-
-# %%
-'''
-모델 성능 평가
-'''
-
-# 평가
-from sklearn.metrics import mean_squared_error
-y_train_pred = lr.predict(X_train)
-
-train_mse = mean_squared_error(y_train, y_train_pred)
-print("Train MSE:%.4f" % train_mse)
-
-test_mse = mean_squared_error(y_test, y_test_pred)
-print("Test MSE:%.4f" % test_mse)
-
-print("y_test 평균:%.4f" % y_test.mean())
-# Train MSE:7.5761
-# Test MSE:10.2466
-# 작을수록 모델 성능이 좋은 것.
-
-# %%
-# K-Fold 교차 검증
-from sklearn.model_selection import cross_val_score
-lr = LinearRegression()
-mse_scores = -1*cross_val_score(lr, X_train, y_train, cv=30,
-                                scoring='neg_mean_squared_error')
-print("개별 Fold MSE:", np.round(mse_scores, 4))
-print("평균 MSE:%.4f" % np.mean(mse_scores))
-# 개별 Fold MSE: [ 6.7685 18.1049 10.0057  8.2255 14.0232]
-# 평균 MSE:11.4255

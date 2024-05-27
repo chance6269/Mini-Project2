@@ -53,11 +53,15 @@ plt.rcParams['figure.dpi'] = 140
 
 # %%
 
-# plt.figure(figsize=(20,20))
-# sns.set(font_scale=0.6)
-# sns.heatmap(df_corr, annot=True, cbar=False)
-# plt.show
+plt.figure(figsize=(15,20))  # 그림의 크기를 크게 설정
+sns.heatmap(data=df.corr(), annot=True, 
+fmt='.2f', linewidths=.5, cmap='Blues', 
+annot_kws={"size": 10})  # 상관 계수 글꼴 크기 확대
 
+# x축, y축 레이블 크기 조정
+plt.xticks(fontsize=20)
+plt.yticks(fontsize=20)
+plt.show()
 # %%
 # 변수 간 상관 관계 분석
  # 실거래가격지수와 상관 관계가 높은 순서대로 정리
