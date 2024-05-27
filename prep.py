@@ -37,13 +37,15 @@ def pop_price_df(loc):
     
     return loc_mean
 
-'울산'
+
 def pop_mov_df(loc):
     '''
     전처리 - 인구이동 데이터
     '''
     pop_mov = pd.read_excel('./data/시군구별_이동데이터/시군구별_이동자수_1301-2403.xlsx')
-    
+    loc_names = {'경북':'경상북도','경남':'경상남도','전북':'전북특별자치도','전남':'전라남도','충북':'충청북도','충남':'충청남도'}
+    if loc in loc_names.keys():
+        loc = loc_names[loc]
     # 지역 데이터 선택
     selected_col = pop_mov.filter(like=loc)
     loc_mov = pd.merge(pop_mov['시점'], selected_col, left_index=True, right_index=True)

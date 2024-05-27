@@ -9,7 +9,7 @@ Created on Sat May 25 04:39:53 2024
 
 import pandas as pd
 # 전처리 파일 로드
-loc = '세종'
+loc = '서울'
 folder_path = "./data/result/"
 file = '{}_월별_평균거래가_이동데이터.xlsx'.format(loc)
 df = pd.read_excel(folder_path+file, index_col=0)
@@ -33,9 +33,9 @@ df.head()
 from sklearn.model_selection import train_test_split
 # cols_selected = ['순이동 (명)']
 # X_data = df.loc[:, cols_selected].dropna()
-X_data = df.drop('월_평균거래가(만원)', axis=1).dropna()
-y_data = df.loc[:, '월_평균거래가(만원)']
-y_data = y_data[:len(X_data)]
+X_data = df.drop('평균가', axis=1).dropna()
+y_data = df.loc[:, '평균가']
+# y_data = y_data[:len(X_data)-1]
 X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, shuffle=True)
 print(X_train.shape, y_train.shape)
 print(X_test.shape, y_test.shape)
@@ -84,6 +84,7 @@ plt.rcParams['figure.dpi'] = 140
 plt.figure(figsize=(10,5))
 ax1 = sns.kdeplot(y_test, label='실제값')
 ax2 = sns.kdeplot(y_test_pred, label='예측값', ax=ax1)
+plt.title('서울 실거래지수 실제값/예측값 분포도')
 plt.legend()
 plt.show()
 

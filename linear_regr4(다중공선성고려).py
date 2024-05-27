@@ -6,7 +6,7 @@ Created on Thu May 23 00:01:50 2024
 """
 
 import pandas as pd
-data = '매매_실거래가격(비교)_수정_v8.xlsx'
+data = './data/매매_실거래가격(비교)_수정_v8.xlsx'
 # df = pd.read_excel(data)
 # df = pd.read_excel(data,parse_dates=['시점'])
 df = pd.read_excel(data,index_col='연도_월')
