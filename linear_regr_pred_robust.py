@@ -6,7 +6,7 @@ Created on Thu May 23 00:01:50 2024
 """
 
 import pandas as pd
-data = './data/매매_실거래가격(비교)_수정_v8.xlsx'
+data = './data/매매_실거래가격(비교)_수정_v11.xlsx'
 # df = pd.read_excel(data)
 # df = pd.read_excel(data,parse_dates=['시점'])
 df = pd.read_excel(data,index_col='연도_월')
@@ -53,54 +53,32 @@ plt.rcParams['figure.dpi'] = 140
 
 # %%
 
-# plt.figure(figsize=(20,20))
-# sns.set(font_scale=0.6)
-# sns.heatmap(df_corr, annot=True, cbar=False)
-# plt.show
+plt.figure(figsize=(20,20))
+sns.set(font_scale=0.6)
+sns.heatmap(df_corr, annot=True, cbar=False)
+plt.show
 
 # %%
 # 변수 간 상관 관계 분석
  # 실거래가격지수와 상관 관계가 높은 순서대로 정리
  
-corr_order = df.corr().loc['대통령':,'실거래가격지수'].abs().sort_values(ascending=False)
+corr_order = df.corr().loc['지지율':,'실거래가격지수'].abs().sort_values(ascending=False)
 corr_order
-# 1인가구            0.916259
-# 무주택가구_수         0.909575
-# 종합부동산세_세율_개인    0.902650
-# 혼인건수            0.898497
-# 4인가구_이상         0.895094
-# 2인가구            0.892621
-# 4인가구            0.887294
-# 국회의석수_진보        0.878452
-# 외국인_장기체류        0.866395
-# 주택부담구입지수        0.859785
-# 이혼건수            0.842368
-# 국회의석수_보수        0.842306
-# 소비자물가지수         0.819332
-# 대통령             0.771748
-# 1인당_주거면적        0.632280
-# PIR지수_전국        0.630363
-# 자가보유율           0.615471
-# 자가점유율           0.564836
-# LIR지수_전국        0.526436
-# 3인가구            0.522893
-# LIR지수_서울        0.467044
-# 주택매매거래량         0.405078
-# 지지율             0.342276
-# 아파트매매거래량        0.298548
-# 예적금담보대출         0.283495
-# PIR지수_서울        0.277978
-# 주택담보대출          0.209577
-# 매매수급동향          0.157530
-# 기준금리            0.131498
-# 토지매매거래량         0.086382
-# 순수토지매매거래량       0.017562
+# 종합부동산세_세율_개인    0.897827
+# 국회의석수_진보        0.869105
+# 주택부담구입지수        0.852691
+# 국회의석수_보수        0.850975
+# 소비자물가지수         0.820183
+# PIR지수_전국        0.628749
+# LIR지수_전국        0.518660
+# 지지율             0.342047
+# 예적금담보대출         0.308376
+# 아파트매매거래량        0.287109
+# 주택담보대출          0.185357
+# 매매수급동향          0.165482
+# 기준금리            0.150050
 # Name: 실거래가격지수, dtype: float64
 
-# %%
-# plot_cols = ['실거래가격지수','1인가구','무주택가구_수','종합부동산세_세율_개인','혼인건수']
-# plot_df = df.loc[:, plot_cols]
-# plot_df.head()
 
 # %%
 # plt.figure(figsize=(10,10))
@@ -113,30 +91,25 @@ corr_order
 # 실거래가격지수 분포
 sns.displot(x='실거래가격지수',kind='hist', data=df)
 plt.show()
-    # 좌편향인걸 확인
+    # 다소 좌편향인걸 확인
     
 # %%
 '''
 피처 스케일링
 '''
-from sklearn.preprocessing import MinMaxScaler
-scaler=MinMaxScaler()
+from sklearn.preprocessing import RobustScaler
+scaler = RobustScaler()
+scaled = scaler.fit_transform(data)
+scaled = pd.DataFrame(scaled, columns = data.columns)
 
-df_scaled = df.iloc[:, 1:]
-scaler.fit(df_scaled)
-df_scaled = scaler.transform(df_scaled)
 
-df.iloc[:, 1:] = df_scaled[:,:]
-df.head()
+data = scaled
+
 
 # %%
 from sklearn.model_selection import train_test_split
-X_data = df.loc[:,['대통령', '지지율', '1인가구', '2인가구', '3인가구', '4인가구', '4인가구_이상',
-       '무주택가구_수', '외국인_장기체류', 'PIR지수_전국', 'PIR지수_서울', 'LIR지수_전국', 'LIR지수_서울',
-       '혼인건수', '이혼건수', '매매수급동향', '주택부담구입지수', '기준금리', '소비자물가지수', '국회의석수_진보',
-       '국회의석수_보수', '종합부동산세_세율_개인', '자가보유율', '자가점유율', '1인당_주거면적', '주택매매거래량',
-       '아파트매매거래량', '토지매매거래량', '순수토지매매거래량', '주택담보대출', '예적금담보대출']]
-y_data = df.loc[:, '실거래가격지수']
+X_data = data
+y_data = target
 X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, shuffle=True)
 print(X_train.shape, y_train.shape)
 print(X_test.shape, y_test.shape)
@@ -167,6 +140,10 @@ ax2 = sns.kdeplot(y_test_pred, label='예측값', ax=ax1)
 plt.legend()
 plt.show()
 
+# %%
+# 테스트 레코드로 예측해보기
+y_pred = lr.predict(X_data.iloc[[-1],:])
+print(y_pred)
 # %%
 '''
 모델 성능 평가

@@ -6,7 +6,7 @@ Created on Thu May 23 00:01:50 2024
 """
 
 import pandas as pd
-data = './data/매매_실거래가격(비교)_수정_v8.xlsx'
+data = './data/매매_실거래가격(비교)_수정_v11.xlsx'
 # df = pd.read_excel(data)
 # df = pd.read_excel(data,parse_dates=['시점'])
 df = pd.read_excel(data,index_col='연도_월')
@@ -64,39 +64,20 @@ plt.rcParams['figure.dpi'] = 140
  # 이상적인 상관 계수 : 0.3~0.7
 corr_order = df.corr().loc['지지율':,'실거래가격지수'].abs().sort_values(ascending=False)
 corr_order
-# 1인가구            0.916259
-# 무주택가구_수         0.909575
-# 종합부동산세_세율_개인    0.902650
-# 혼인건수            0.898497
-# 4인가구_이상         0.895094
-# 2인가구            0.892621
-# 4인가구            0.887294
-# 국회의석수_진보        0.878452
-# 외국인_장기체류        0.866395
-# 주택부담구입지수        0.859785
-# 이혼건수            0.842368
-# 국회의석수_보수        0.842306
-# 소비자물가지수         0.819332
-# 대통령             0.771748 ----
-# 1인당_주거면적        0.632280
-# PIR지수_전국        0.630363
-# 자가보유율           0.615471
-# 자가점유율           0.564836
-# LIR지수_전국        0.526436
-# 3인가구            0.522893
-# LIR지수_서울        0.467044 ----
-# 주택매매거래량         0.405078
-# 지지율             0.342276
-# 아파트매매거래량        0.298548
-# 예적금담보대출         0.283495
-# PIR지수_서울        0.277978 ----
-# 주택담보대출          0.209577
-# 매매수급동향          0.157530
-# 기준금리            0.131498 ----
-# 토지매매거래량         0.086382
-# 순수토지매매거래량       0.017562 ----
+# 종합부동산세_세율_개인    0.897827
+# 국회의석수_진보        0.869105
+# 주택부담구입지수        0.852691
+# 국회의석수_보수        0.850975
+# 소비자물가지수         0.820183
+# PIR지수_전국        0.628749
+# LIR지수_전국        0.518660
+# 지지율             0.342047
+# 예적금담보대출         0.308376
+# 아파트매매거래량        0.287109
+# 주택담보대출          0.185357
+# 매매수급동향          0.165482
+# 기준금리            0.150050
 # Name: 실거래가격지수, dtype: float64
-
 
 # %%
 # 실거래가격지수 분포
@@ -140,16 +121,23 @@ plt.ylabel("% of Variance Explained", fontsize=12)
 plt.show()
 
 # %%
-pca = PCA(n_components=4, random_state=1004)
+pca = PCA(n_components=8, random_state=1004)
 df_pca = pca.fit_transform(df.iloc[:, 1:])
 
+
+# %%
+# 주성분 기여도 확인하기
 loadings = pca.components_
 
-# 원본 변수 이름 가져오기
+    # 원본 변수 이름 가져오기
 feature_names = df.iloc[:, 1:].columns
 
-# 주성분 로딩을 데이터프레임으로 변환
-loading_df = pd.DataFrame(loadings.T, columns=['PC1', 'PC2', 'PC3','PC4'], index=feature_names)
+    # 주성분 로딩을 데이터프레임으로 변환
+pca_cols = []
+for i in range(len(loadings)):
+    pca_cols.append(f'PC{i+1}')
+
+loading_df = pd.DataFrame(loadings.T, columns=pca_cols, index=feature_names)
 
 print("Principal Component Loadings:")
 print(loading_df)

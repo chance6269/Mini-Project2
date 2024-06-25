@@ -29,9 +29,6 @@ target = df.loc[:,['실거래가격지수']]
 # 상관관계 행렬
 df_corr = df.corr()
 
-# correlation = df[['기준금리', '주택담보대출']].corr()
-# print(f'PIR와 LIR의 상관관계:\n{correlation}')
-
 
 # %%
 def reg():
@@ -68,12 +65,19 @@ plt.show
 corr_order = df.corr().loc['지지율':,'실거래가격지수'].abs().sort_values(ascending=False)
 corr_order
 # 종합부동산세_세율_개인    0.897827
+# 국회의석수_진보        0.869105
+# 주택부담구입지수        0.852691
+# 국회의석수_보수        0.850975
 # 소비자물가지수         0.820183
 # PIR지수_전국        0.628749
+# LIR지수_전국        0.518660
 # 지지율             0.342047
+# 예적금담보대출         0.308376
 # 아파트매매거래량        0.287109
 # 주택담보대출          0.185357
 # 매매수급동향          0.165482
+# 기준금리            0.150050
+# 토지매매거래량         0.127727
 # Name: 실거래가격지수, dtype: float64
 
 
@@ -106,8 +110,8 @@ df.head()
 
 # %%
 from sklearn.model_selection import train_test_split
-X_data = df.loc[:,'지지율':]
-y_data = df.loc[:, '실거래가격지수']
+X_data = df.iloc[:-1,1:]
+y_data = df.iloc[:-1, 0]
 X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, shuffle=True)
 print(X_train.shape, y_train.shape)
 print(X_test.shape, y_test.shape)
@@ -137,15 +141,11 @@ ax1 = sns.kdeplot(y_test, label='실제값')
 ax2 = sns.kdeplot(y_test_pred, label='예측값', ax=ax1)
 plt.legend()
 plt.show()
+
 # %%
-# 산점도
-
-plt.figure(figsize=(10,5))
-plt.scatter(X_test['지지율'], y_test, label='y_test')
-plt.scatter(X_test['지지율'], y_test_pred, c='r', label='y_pred')
-plt.legend(loc='best')
-plt.show()
-
+# 테스트 레코드로 예측해보기
+y_pred = lr.predict(X_data.iloc[[-1],:])
+print(y_pred)
 # %%
 '''
 모델 성능 평가
