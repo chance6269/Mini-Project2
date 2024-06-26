@@ -7,10 +7,8 @@ Created on Thu May 23 00:01:50 2024
 
 import pandas as pd
 data = './data/매매_실거래가격(비교)_수정_v11.xlsx'
-# df = pd.read_excel(data)
-# df = pd.read_excel(data,parse_dates=['시점'])
-df = pd.read_excel(data,index_col='연도_월')
 
+df = pd.read_excel(data,index_col='연도_월')
 
 # %%
 df.index
@@ -21,13 +19,6 @@ df.columns
 data = df.iloc[:,1:]
 
 target = df.loc[:,['실거래가격지수']]
-
-# %%
-'''
-상관관계분석
-'''
-# 상관관계 행렬
-df_corr = df.corr()
 
 
 # %%
@@ -50,48 +41,6 @@ reg()
 plt.rc('font', family='NanumBarunGothic')
 plt.rcParams['figure.dpi'] = 140
 
-
-# %%
-
-plt.figure(figsize=(20,20))
-sns.set(font_scale=0.6)
-sns.heatmap(df_corr, annot=True, cbar=False)
-plt.show
-
-# %%
-# 변수 간 상관 관계 분석
- # 실거래가격지수와 상관 관계가 높은 순서대로 정리
- 
-corr_order = df.corr().loc['지지율':,'실거래가격지수'].abs().sort_values(ascending=False)
-corr_order
-# 종합부동산세_세율_개인    0.897827
-# 국회의석수_진보        0.869105
-# 주택부담구입지수        0.852691
-# 국회의석수_보수        0.850975
-# 소비자물가지수         0.820183
-# PIR지수_전국        0.628749
-# LIR지수_전국        0.518660
-# 지지율             0.342047
-# 예적금담보대출         0.308376
-# 아파트매매거래량        0.287109
-# 주택담보대출          0.185357
-# 매매수급동향          0.165482
-# 기준금리            0.150050
-# Name: 실거래가격지수, dtype: float64
-
-
-# %%
-# plt.figure(figsize=(10,10))
-# for idx, col in enumerate(plot_cols[1:]):
-#     ax1 = plt.subplot(2, 2, idx+1)
-#     sns.regplot(x=col, y=plot_cols[0], data=plot_df, ax=ax1)
-# plt.show()
-
-# %%
-# 실거래가격지수 분포
-sns.displot(x='실거래가격지수',kind='hist', data=df)
-plt.show()
-    # 다소 좌편향인걸 확인
     
 # %%
 '''
@@ -102,9 +51,7 @@ scaler = RobustScaler()
 scaled = scaler.fit_transform(data)
 scaled = pd.DataFrame(scaled, columns = data.columns)
 
-
 data = scaled
-
 
 # %%
 from sklearn.model_selection import train_test_split
@@ -113,8 +60,7 @@ y_data = target
 X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, shuffle=True)
 print(X_train.shape, y_train.shape)
 print(X_test.shape, y_test.shape)
-# (105, 2) (105,)
-# (27, 2) (27,)
+
 # %%
 
 '''
@@ -140,10 +86,6 @@ ax2 = sns.kdeplot(y_test_pred, label='예측값', ax=ax1)
 plt.legend()
 plt.show()
 
-# %%
-# 테스트 레코드로 예측해보기
-y_pred = lr.predict(X_data.iloc[[-1],:])
-print(y_pred)
 # %%
 '''
 모델 성능 평가

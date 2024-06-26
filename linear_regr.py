@@ -6,11 +6,9 @@ Created on Thu May 23 00:01:50 2024
 """
 
 import pandas as pd
-data = './data/매매_실거래가격(비교)_수정_v11.xlsx'
-# df = pd.read_excel(data)
-# df = pd.read_excel(data,parse_dates=['시점'])
-df = pd.read_excel(data,index_col='연도_월')
+file = './data/매매_실거래가격(비교)_수정_v11.xlsx'
 
+df = pd.read_excel(file,index_col='연도_월')
 
 # %%
 df.index
@@ -56,17 +54,17 @@ plt.rcParams['figure.dpi'] = 140
 
 # %%
 
-plt.figure(figsize=(20,20))
-sns.set(font_scale=0.6)
-sns.heatmap(df_corr, annot=True, cbar=False)
-plt.show
+# plt.figure(figsize=(20,20))
+# sns.set(font_scale=0.6)
+# sns.heatmap(df_corr, annot=True, cbar=False)
+# plt.show
 
 # %%
 # 변수 간 상관 관계 분석
  # 실거래가격지수와 상관 관계가 높은 순서대로 정리
  
-corr_order = df.corr().loc['지지율':,'실거래가격지수'].abs().sort_values(ascending=False)
-corr_order
+# corr_order = df.corr().loc['지지율':,'실거래가격지수'].abs().sort_values(ascending=False)
+# corr_order
 # 종합부동산세_세율_개인    0.897827
 # 소비자물가지수         0.820183
 # PIR지수_전국        0.628749
@@ -78,16 +76,9 @@ corr_order
 
 
 # %%
-# plt.figure(figsize=(10,10))
-# for idx, col in enumerate(plot_cols[1:]):
-#     ax1 = plt.subplot(2, 2, idx+1)
-#     sns.regplot(x=col, y=plot_cols[0], data=plot_df, ax=ax1)
-# plt.show()
-
-# %%
 # 실거래가격지수 분포
-sns.displot(x='실거래가격지수',kind='hist', data=df)
-plt.show()
+# sns.displot(x='실거래가격지수',kind='hist', data=df)
+# plt.show()
     # 다소 좌편향인걸 확인
     
 # %%
@@ -111,8 +102,7 @@ y_data = df.loc[:, '실거래가격지수']
 X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, shuffle=True)
 print(X_train.shape, y_train.shape)
 print(X_test.shape, y_test.shape)
-# (105, 2) (105,)
-# (27, 2) (27,)
+
 # %%
 
 '''
@@ -140,11 +130,11 @@ plt.show()
 # %%
 # 산점도
 
-plt.figure(figsize=(10,5))
-plt.scatter(X_test['지지율'], y_test, label='y_test')
-plt.scatter(X_test['지지율'], y_test_pred, c='r', label='y_pred')
-plt.legend(loc='best')
-plt.show()
+# plt.figure(figsize=(10,5))
+# plt.scatter(X_test['지지율'], y_test, label='y_test')
+# plt.scatter(X_test['지지율'], y_test_pred, c='r', label='y_pred')
+# plt.legend(loc='best')
+# plt.show()
 
 # %%
 '''
@@ -161,7 +151,7 @@ test_mse = mean_squared_error(y_test, y_test_pred)
 print("Test MSE:%.4f" % test_mse)
 
 # Train MSE:2.1746
-# Test MsE:4.4011
+# Test MSE:4.4011
 # 작을수록 모델 성능이 좋은 것.
 
 # %%

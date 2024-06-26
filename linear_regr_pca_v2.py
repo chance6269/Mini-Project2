@@ -25,7 +25,7 @@ df.index
 # float형인 날짜열을 str형으로 변경 + 10월 처리
 df.index = df.index.astype(str).map(lambda x: x + '0' if len(x) < 7 else x)
 df.columns
-data = df.iloc[:,1:]
+data = df.drop(columns='실거래가격지수')
 
 target = df.loc[:,['실거래가격지수']]
 

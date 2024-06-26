@@ -81,9 +81,9 @@ corr_order
 
 # %%
 # 실거래가격지수 분포
-sns.displot(x='실거래가격지수',kind='hist', data=df)
-plt.show()
-    # 좌편향인걸 확인
+# sns.displot(x='실거래가격지수',kind='hist', data=df)
+# plt.show()
+#     # 좌편향인걸 확인
     
 # %%
 '''

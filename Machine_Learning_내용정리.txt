@@ -3,14 +3,116 @@
 - 후진제거법 :
 	- 처음엔 32개의 변수를 사용하여 훈련시켰으나, 과대적합 발생
 		-> 해결하기위해 차원축소(변수 제거, 주성분 분석)
+		-> 7개 변수 선정
 
 - LinearRegression
 	- 스케일링
-		- Min-Max 스케일링
-		- Robust 스케일링
+		1) Min-Max 스케일링
+			- 결정계수 : 0.933
+			- Train MSE:23.5824 / Test MSE:16.7246
+			- K-Fold 평균 MSE :47.4038
+				* 결정계수는 Robust에 비해 높은 편이나, 과대적합 발생
+				- 결정계수 상승을 위해 PolynomialFeatures 적용
+					- degree 2 : 
+						- 결정계수 0.96으로 상승
+						- Train MSE:1.4437 / Test MSE:4.0357
+						- K-Fold 교차검증시, 평균 MSE가 더 높아짐.(평균 MSE:906)
+						* 예측력은 상승했으나 Train 데이터에 비해 Test 데이터의 MSE가 커지는 과대적합 상태.
+						
+						-> 과대적합 해결시도
+							- L1(Lasso) 
+								- 결정계수 : 0.967
+								- Train MSE : 8.91 / Test MSE : 7.53
+								- K-Fold 평균 MSE:27.1354
+								* 예측력이 소폭 상승하고 과대적합 완화됨.
+								* MSE 상승으로 모델 성능 감소한 것처럼 보이나, 평균 MSE가 안정된 효과.
+								
+							- L2(Ridge)
+								- 결정 계수 : 0.90 -> 결정계수 감소
+								- Train MSE:23.407 / Test MSE:22.453
+								- K-Fold 평균 MSE:35.9372
+								* 예측력도 떨어지고 MSE도 L1에 비해 큰 편.
+								
+							- ElasticNet(L1 + L2)
+								- 결정계수 : 0.958
+								- Train MSE:10.288 / Test MSE:9.6019
+								- K-Fold 평균 MSE:37.7062
+								* L1에 비하면 떨어지지만 예측력이 유지되며, 과대적합이 완화됨.
+								
+							- PCA(주성분 분석)
+								- 결정계수: 0.946
+								- Train MSE:4.7627 / Test MSE:14.4011
+								- K-Fold 평균 MSE:8.5391
+								* 결정계수는 올, MSE 상승, 평균 MSE가 안정된 효과.
+								* 과대적합 완화 실패
+							
+					- degree 3, 4: 결정계수 -0.08, 0.622 로 결정계수 급감. 차수를 2 이상으로 올리는 것은 역효과나는 것을 확인.
+					
+		2) Robust 스케일링
+			- 변수별 상자 수염 그림으로 분포를 확인했을때, 이상치가 다소 발견되는 변수들이 있어, Robust 스케일링 적용해봄.
+			- 결정계수 : 0.925
+			- Train MSE:21.5437 / Test MSE:24.8754
+			- K-Fold 평균 MSE : 28.591
+				* Min-Max에 비해 결정계수 감소
+				- 결정계수 상승을 위해 PolynomialFeatures 적용
+					- degree 2 : 
+						- 결정계수 : 0.98
+						- Train MSE:1.3536 / Test MSE:4.1513
+						- K-Fold 평균 MSE:4.9095
+						* 그러나 Train 데이터에 비해 Test 데이터의 MSE가 커지는 과대적합 상태
+						* K-Fold 교차검증시, 평균 MSE 감소
+						
+						-> 과대적합 해결 시도
+							- L1(Lasso) 
+								- 결정계수 : 0.975
+								- Train MSE : 2.5826 / Test MSE:5.4744
+								- K-Fold 평균 MSE:27.1354
+								* 예측력이 감소, 과대적합 여전.
+								
+							- L2(Ridge)
+								- 결정 계수 : 0.965
+								- Train MSE:3.4140 / Test MSE:7.8092
+								- K-Fold 평균 MSE:5.7919
+								* 예측력도 감소, 과대적합 여전.
+								
+							- ElasticNet(L1 + L2)
+								- 결정계수 : 0.980
+								- Train MSE:1.9016 / Test MSE:4.5055
+								- K-Fold 평균 MSE:3.9525
+								* 큰 변화 없음.
+								
+							- PCA(주성분 분석)
+								- 결정계수: 0.912
+								- Train MSE:4.4733 / Test MSE:22.9941
+								- K-Fold 평균 MSE:388.6948
+								* 결정계수 감소, 과대적합 여전, K-Fold 평균 MSE 급상승 -> 성능 악화
+								
+							- L1 + PCA
+								- 결정계수: 0.917
+								- Train MSE:4.9936 / Test MSE:21.6684
+								- K-Fold 평균 MSE:274.2994
+								* 성능 악화
+								
+							- L2 + PCA
+								- 결정계수: 0.925
+								- Train MSE:6.0123 / Test MSE:19.6509
+								- K-Fold 평균 MSE:247.4508
+								* 성능 악화
+								
+							- ElasticNet + PCA
+								- 결정계수: 0.915
+								- Train MSE:4.6096 / Test MSE:22.2285
+								- K-Fold 평균 MSE:315.8180
+								* 성능 악화
+							
+							
+					- degree 3: 결정계수 0.74, 0.622 로 결정계수 급감. 차수를 2 이상으로 올리는 것은 역효과나는 것을 확인.
+					- degree 4: 결정계수는 0.94였으나, 과대적합 상태 유지, K-Fold 교차검증시 평균 MSE 65690 이상으로 매우 높음
+					
 	
 	- 과대적합억제
 		- L1
 		- L2
 		- ElasticNet
 		- PCA(주성분 분석)
+		
