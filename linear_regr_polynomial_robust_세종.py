@@ -182,7 +182,7 @@ from sklearn.linear_model import ElasticNet
 ela = ElasticNet(alpha=0.01, l1_ratio=0.7)
 # ela = ElasticNet(alpha=0.03, l1_ratio=0.7)
 # ela = ElasticNet(alpha=0.05, l1_ratio=0.7)
-ela = ElasticNet(alpha=0.3, l1_ratio=0.5)
+# ela = ElasticNet(alpha=0.3, l1_ratio=0.5)
 ela.fit(X_train_poly, y_train)
 print('ElasticNet 결정계수:',ela.score(X_test_poly,y_test))
 
@@ -198,7 +198,8 @@ kfc_val(ela, X_train_poly, y_train)
 
 # %%
 
+data_reshaped = X_data.iloc[-1,:].values.reshape(1, -1)
+test_data_poly = pf.fit_transform(data_reshaped)
+test_pred = las.predict(test_data_poly)
 
-test_pred = rdg.predict(test_data_poly)
-
-print(f"%.4f"%test_pred)
+print("%.4f"%test_pred)
