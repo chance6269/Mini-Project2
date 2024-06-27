@@ -6,7 +6,7 @@ Created on Thu May 23 00:01:50 2024
 """
 
 import pandas as pd
-file = './data/매매_실거래가격(비교)_수정_v11.xlsx'
+file = './data/result/세종_월별_실거래지수_이동데이터_변수추가.xlsx'
 
 df = pd.read_excel(file,index_col='연도_월')
 
@@ -18,7 +18,7 @@ df.index = df.index.astype(str).map(lambda x: x + '0' if len(x) < 7 else x)
 df.columns
 data = df.iloc[:,1:]
 
-target = df.loc[:,['실거래가격지수']]
+target = df.loc[:,['실거래지수']]
 
 # %%
 '''
@@ -26,6 +26,8 @@ target = df.loc[:,['실거래가격지수']]
 '''
 # 상관관계 행렬
 df_corr = df.corr()
+
+print(df_corr)
 
 # %%
 def reg():
@@ -52,27 +54,26 @@ plt.rcParams['figure.dpi'] = 140
 '''
 피처 스케일링
 '''
-from sklearn.preprocessing import RobustScaler
-scaler = RobustScaler()
-scaled = scaler.fit_transform(data)
-scaled = pd.DataFrame(scaled, columns = data.columns)
+from sklearn.preprocessing import MinMaxScaler
+scaler=MinMaxScaler()
 
+df_scaled = df.iloc[:, 1:]
+scaler.fit(df_scaled)
+df_scaled = scaler.transform(df_scaled)
 
-data = scaled
-
-# df.iloc[:, 1:] = df_scaled[:,:]
+df.iloc[:, 1:] = df_scaled[:,:]
 # df.head()
+
 
 # %%
 # 데이터 분할
 from sklearn.model_selection import train_test_split
-X_data = data
+X_data = df.iloc[:, 1:]
 y_data = target
 X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, shuffle=True)
 # print(X_train.shape, y_train.shape)
 # print(X_test.shape, y_test.shape)
-# (105, 2) (105,)
-# (27, 2) (27,)
+
 
 # %%
 ''' 다항식 변환'''
@@ -106,6 +107,7 @@ ax1 = sns.kdeplot(y_test, label='실제값')
 ax2 = sns.kdeplot(y_test_pred, label='예측값', ax=ax1)
 plt.legend()
 plt.show()
+
 # %%
 def kfc_val(model, x,y):
     # K-Fold 교차 검증
@@ -143,8 +145,6 @@ kfc_val(lr, X_train_poly, y_train)
 # Ridge(L2 규제)
 from sklearn.linear_model import Ridge
 rdg = Ridge(alpha=2.5)
-# rdg = Ridge(alpha=4)
-# rdg = Ridge(alpha=5)
 rdg.fit(X_train_poly, y_train)
 print('Ridge 결정계수:',rdg.score(X_test_poly,y_test))
 
@@ -162,8 +162,6 @@ kfc_val(rdg, X_train_poly, y_train)
 # Lasso(L1 규제)
 from sklearn.linear_model import Lasso
 las = Lasso(alpha=0.05)
-# las = Lasso(alpha=0.2)
-# las = Lasso(alpha=0.3)
 las.fit(X_train_poly, y_train)
 print('Lasso 결정계수:',las.score(X_test_poly,y_test))
 
@@ -180,9 +178,6 @@ kfc_val(las, X_train_poly, y_train)
 # ElasticNet(L2/L1 규제)
 from sklearn.linear_model import ElasticNet
 ela = ElasticNet(alpha=0.01, l1_ratio=0.7)
-# ela = ElasticNet(alpha=0.03, l1_ratio=0.7)
-# ela = ElasticNet(alpha=0.05, l1_ratio=0.7)
-ela = ElasticNet(alpha=0.3, l1_ratio=0.5)
 ela.fit(X_train_poly, y_train)
 print('ElasticNet 결정계수:',ela.score(X_test_poly,y_test))
 

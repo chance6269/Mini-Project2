@@ -6,7 +6,7 @@ Created on Thu May 23 00:01:50 2024
 """
 
 import pandas as pd
-file = './data/매매_실거래가격(비교)_수정_v11.xlsx'
+file = './data/result/세종_월별_실거래지수_이동데이터_변수추가.xlsx'
 
 df = pd.read_excel(file,index_col='연도_월')
 
@@ -18,7 +18,7 @@ df.index = df.index.astype(str).map(lambda x: x + '0' if len(x) < 7 else x)
 df.columns
 data = df.iloc[:,1:]
 
-target = df.loc[:,['실거래가격지수']]
+target = df.loc[:,['실거래지수']]
 
 # %%
 '''
@@ -195,3 +195,10 @@ print("Test MSE:%.4f" % test_mse)
 # Train MSE:33.7551
 # Test MSE:39.4968
 kfc_val(ela, X_train_poly, y_train)
+
+# %%
+
+
+test_pred = rdg.predict(test_data_poly)
+
+print(f"%.4f"%test_pred)

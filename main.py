@@ -8,7 +8,7 @@ Created on Mon May 27 11:50:09 2024
 import prep
 import visual
 import prep_pt as pp
-
+# %%
 prep.make_data('경기')
 
 visual.make_charts('경기')
